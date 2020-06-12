@@ -1,0 +1,21 @@
+{
+  "name": "muyian",
+  "version": "1.0.0",
+  "description": "muyian",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest test 20"
+  },
+  "keywords": [
+    "date",
+    "manager",
+    "date",
+    "format",
+    "date"
+  ],
+  "author": "AlejoNext <AlejoNext@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^26.0.1"
+  }
+}
