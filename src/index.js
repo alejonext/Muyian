@@ -66,7 +66,7 @@ class Muyian extends Date {
    * @return {[type]}     [description]
    */
   getWeek (num) {
-    return Math.round(this.dayOfYear() / Muyian.TIME.week ) + (this.firstDayYearISO > CONTS.TIME.weekStart);
+    return Math.round(this.dayOfYear() / CONTS.TIME.week ) + (this.firstDayYearISO > CONTS.TIME.weekStart);
   }
   /**
    * [getQuarter description]
@@ -158,7 +158,7 @@ class Muyian extends Date {
    * @return {[type]}      [description]
    */
   startOf (type) {
-    return this.of(type, [ 0, 0, 1, 0, 0, 0, 0 ].reverse());
+    return this.of(type, [ 0, 0, 0, 0, 1, 0, 0 ]);
   }
   /**
    * [endOf description]
@@ -166,7 +166,7 @@ class Muyian extends Date {
    * @return {[type]}      [description]
    */
   endOf (type) {
-    return this.of(type, [ NaN, 11, ((e) => e.daysInMonth()) , 23, 59, 59, 999 ].reverse());
+    return this.of(type, [ 999, 59, 59, 23, ((e) => e.daysInMonth()), 11, NaN ]);
   }
   /**
    * [relative description]
@@ -179,7 +179,7 @@ class Muyian extends Date {
     return Muyian.TIME
       .reduce((res, time, index) => ( typeof res === 'number'
           && ( res / CONTS.TIME[time] ) < 0
-          && local.format(Math.round(res / CONTS.TIME[rever[index - 1]]) * multiple , rever[index - 1])
+          && local.format(Math.round(res / CONTS.TIME[rever[index - 1]]) * multiple, rever[index - 1])
         ) || res, this.diff(date));
   }
   /**
