@@ -4,7 +4,8 @@
   "description": "muyian",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest test 20"
+    "test": "jest test 20",
+    "build": "babel src/index.js -d dist"
   },
   "keywords": [
     "date",
@@ -16,6 +17,9 @@
   "author": "AlejoNext <AlejoNext@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
     "jest": "^26.0.1"
   }
 }
