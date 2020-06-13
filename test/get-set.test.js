@@ -123,7 +123,7 @@ describe("Set/Get", () => {
 
   it('Immutable Set', () => {
     const muyianA = new Muyian()
-    const muyianB = new MuyianA.set('year', 2011)
+    const muyianB = muyianA.set('year', 2011)
     const momentA = moment()
     const momentB = momentA.set('year', 2011)
     expect(muyianA.valueOf()).not.toBe(muyianB.valueOf())

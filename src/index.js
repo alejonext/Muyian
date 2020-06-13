@@ -1,5 +1,5 @@
-import CONTS from './const';
-import Format from './format';
+import * as CONTS from './const';
+import * as Format from './format';
 
 class Muyian extends Date {
   /**
@@ -9,8 +9,8 @@ class Muyian extends Date {
   get firstDayYearISO(){
     return new Muyian(this)
       .startOf(CONTS.Y)
-      .date(CONTS.time.dayInWeek - 1)
-      .day(CONTS.time.weekStart)
+      .date(CONTS.TIME.dayInWeek - 1)
+      .day(CONTS.TIME.weekStart)
       .day();
   }
   /**
@@ -18,7 +18,7 @@ class Muyian extends Date {
    * @return {[type]} [description]
    */
   unix () {
-    return this.valueOf() / CONTS.time.second;
+    return this.valueOf() / CONTS.TIME.second;
   }
   /**
    * [set description]
@@ -26,7 +26,7 @@ class Muyian extends Date {
    * @param {[type]} num  [description]
    */
   set (type, num) {
-    return new Muyian(Muyian.prototype['set' + CONTS.ToPrototype(CONTS.Date[type] || type)].call(this, num) );
+    return new Muyian(Muyian.prototype['set' + CONTS.PROTOTYPE(CONTS.Date[type] || type)].call(this, num) );
   }
   /**
    * [get description]
@@ -34,7 +34,7 @@ class Muyian extends Date {
    * @return {[type]}      [description]
    */
   get (type) {
-    return Muyian.prototype['get' + CONTS.ToPrototype(CONTS.Date[type] || type)].call(this);
+    return Muyian.prototype['get' + CONTS.PROTOTYPE(CONTS.Date[type] || type)].call(this);
   }
   /**
    * [add description]
@@ -58,7 +58,7 @@ class Muyian extends Date {
    * @param {[type]} num [description]
    */
   setWeek (num) {
-    return new Muyian(this.startOf(CONTS.Y).valueOf() + ( CONTS.time.week * ( num + (this.firstDayYearISO > CONTS.time.weekStart))));
+    return new Muyian(this.startOf(CONTS.Y).valueOf() + ( CONTS.TIME.week * ( num + (this.firstDayYearISO > CONTS.TIME.weekStart))));
   }
   /**
    * [getWeek description]
@@ -66,28 +66,28 @@ class Muyian extends Date {
    * @return {[type]}     [description]
    */
   getWeek (num) {
-    return Math.round(this.dayOfYear() / Muyian.TIME.week ) + (this.firstDayYearISO > CONTS.time.weekStart);
+    return Math.round(this.dayOfYear() / Muyian.TIME.week ) + (this.firstDayYearISO > CONTS.TIME.weekStart);
   }
   /**
    * [getQuarter description]
    * @return {[type]} [description]
    */
   getQuarter () {
-    return Math.round((this.daysOfYear() * CONTS.time.day) / CONTS.time.year ) + 1
+    return Math.round((this.daysOfYear() * CONTS.TIME.day) / CONTS.TIME.year ) + 1
   }
   /**
    * [setQuarter description]
    * @param {[type]} num [description]
    */
   setQuarter (num) {
-    return new Muyian(this.valueOf() + (CONTS.time.year / num ));
+    return new Muyian(this.valueOf() + (CONTS.TIME.year / num ));
   }
   /**
    * [setDay description]
    * @param {[type]} num [description]
    */
   setDay (num) {
-    return new Muyian( this.setDate( ( this.getDate() - this.getDay() ) + num ) );
+    return new Muyian(this.setDate(( this.getDate() - this.getDay() ) + num ) );
   }
   /**
    * [isoWeekday description]
@@ -119,7 +119,7 @@ class Muyian extends Date {
    * @return {[type]} [description]
    */
   toObject () {
-    return CONTS.format.Date
+    return CONTS.DATE_PROTO
       .reduce((res, e) => ({ ...res, [e] : this.get(e) }), {})
   }
   /**
@@ -127,14 +127,16 @@ class Muyian extends Date {
    * @return {[type]} [description]
    */
   toArray () {
-    return CONTS.format.Date.map(e => this.get(e));
+    return CONTS.DATE_PROTO
+      .map(e => this.get(e));
   }
   /**
    * [isValid description]
    * @return {Boolean} [description]
    */
   isValid () {
-    return Muyian.isMuyian(this) && this.toString() !== CONTS.INVALID;
+    return Muyian.isMuyian(this)
+        && this.toString() !== CONTS.INVALID;
   }
   /**
    * [of description]
@@ -143,8 +145,8 @@ class Muyian extends Date {
    * @return {[type]}       [description]
    */
   of (type, array) {
-    return Muyian.TIME()
-      .slice(Muyian.TIME().indexOf(type) + 1 )
+    return Muyian.TIME
+      .slice(Muyian.TIME.indexOf(type) + 1 )
       .reduce((res, e, i) => res.set(e,
           !isNaN(parseFloat(array[i])) && isFinite(array[i])
           ? array[i]
@@ -174,10 +176,10 @@ class Muyian extends Date {
    * @return {[type]}          [description]
    */
   relative(date, locale, multiple= 1){
-    return Muyian.TIME()
+    return Muyian.TIME
       .reduce((res, time, index) => ( typeof res === 'number'
-          && res / CONTS.format.time[time] < 0
-          && local.format(Math.round(res / CONTS.format.time[rever[index - 1]]) * multiple , rever[index - 1])
+          && ( res / CONTS.TIME[time] ) < 0
+          && local.format(Math.round(res / CONTS.TIME[rever[index - 1]]) * multiple , rever[index - 1])
         ) || res, this.diff(date));
   }
   /**
@@ -187,7 +189,7 @@ class Muyian extends Date {
    * @return {[type]}        [description]
    */
   to (date, locale) {
-    return this.relative(date, new Intl.RelativeTimeFormat(locale || this.locale || Muyian.locale, { numeric: 'auto' }),  -1);
+    return this.relative(date, new Intl.RelativeTimeFormat(locale || this.locale || Muyian.locale, CONTS.TIME.number),  -1);
   }
   /**
    * [form description]
@@ -196,7 +198,7 @@ class Muyian extends Date {
    * @return {[type]}        [description]
    */
   form (date, locale) {
-    return this.relative(date, new Intl.RelativeTimeFormat(locale || this.locale || Muyian.locale, { numeric: 'auto' }));
+    return this.relative(date, new Intl.RelativeTimeFormat(locale || this.locale || Muyian.locale, CONTS.TIME.number));
   }
   /**
    * [toNow description]
@@ -225,7 +227,7 @@ class Muyian extends Date {
    * @return {[type]} [description]
    */
   getTimezone () {
-    return this.getTimezoneOffset() / CONTS.time.minute;
+    return this.getTimezoneOffset() / CONTS.TIME.minute;
   }
   /**
    * [getTimezoneGTM description]
@@ -235,16 +237,16 @@ class Muyian extends Date {
   getTimezoneGTM (sep) {
     const P = this.getTimezoneOffset();
     return Math.sign(P) + ''
-      + (parseInt(P / CONTS.time.minute, 10) + 100).toString().substr(1)
+      + (parseInt(P / CONTS.TIME.minute, 10) + 100).toString().substr(1)
       + ( !sep ? ':' : '' )
-      + (parseInt(P % CONTS.time.second, 10) + 100).toString().substr(1);
+      + (parseInt(P % CONTS.TIME.second, 10) + 100).toString().substr(1);
   }
   /**
    * [getNameTimezone description]
    * @return {[type]} [description]
    */
   getNameTimezone (locale) {
-    var tz = this.toLocaleTimeString(locale || this.locale || Muyian.locale, {timeZoneName: 'short'}).split(' ')
+    var tz = this.toLocaleTimeString(locale || this.locale || Muyian.locale, { timeZoneName: 'short' }).split(' ')
     return tz[tz.length - 1];
   }
   /**
@@ -257,8 +259,8 @@ class Muyian extends Date {
   diff (date, type, notRound) {
     let diff = new Muyian(date).valueOf() - this.valueOf();
 
-    if(CONTS.time[type]){
-      diff = diff / CONTS.time[type];
+    if(CONTS.TIME[type]){
+      diff = diff / CONTS.TIME[type];
     }
 
     if(!notRound){
@@ -274,14 +276,14 @@ class Muyian extends Date {
    * @return {[type]}        [description]
    */
   format (format, locale) {
-    return format.replace(CONTS.format.chr,
+    return format.replace(CONTS.CHR,
         chr => ( Format[chr[1]] && Format[chr[1]](this, locale || this.locale || Muyian.locale ) ) || chr );
   }
 }
 
-Object.keys(CONTS.time)
+Object.keys(CONTS.TIME)
   .forEach((val) => Muyian.prototype[val] = function (num) {
-  return!isNaN(parseFloat(num)) && isFinite(num)
+  return !isNaN(parseFloat(num)) && isFinite(num)
       ? this.set(val, num)
       : this.get(val);
 });
@@ -319,11 +321,11 @@ Muyian.unix = (any) => new Muyian(any);
  * [description]
  * @return {[type]} [description]
  */
-Muyian.TIME = () => Array.form(CONTS.format.Date).reverse();
+Muyian.TIME = Array.form(CONTS.DATE_PROTO).reverse();
 /**
  * [locale description]
  * @type {[type]}
  */
 Muyian.locale = ( navigator && navigator.language ) || 'en';
 
-module.exports = Muyian;
+export default Muyian;
