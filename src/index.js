@@ -268,8 +268,7 @@ class Muyian extends Date {
    * @return {[type]}     [description]
    */
   getTimezoneGTM(sep) {
-    const P = this.getTimezoneOffset();
-    return Math.sign(P)
+    return Math.sign(this.getTimezoneOffset())
       + ''
       + Muyian.Format.h(time, this.locale)
       + (!sep ? ':' : '')
