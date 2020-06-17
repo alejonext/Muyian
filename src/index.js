@@ -12,6 +12,7 @@ const DIGIT2 = '2-digit';
 const SHORT = '2-digit';
 const LONG = 'long';
 const NUMERIC = 'numeric';
+const hourCycle = '12h';
 const PROTOTYPE = str => str[0].toUpperCase() + str.slice(1);
 const PARSE = /^(\d{4})-?(\d{1,2})-?(\d{0,2})[^0-9]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?.?(\d{1,3})?$/;
 const DEFAULT = '%Y-%m-%d T%H:%i:%s%P';
@@ -46,6 +47,13 @@ class Muyian extends Date {
    */
   get firstDayYearISO() {
     return new Muyian(this).startOf(Y).date(TIME.dayInWeek - 1).day(TIME.weekStart).day();
+  }
+  /**
+   * [clone description]
+   * @return {[type]} [description]
+   */
+  clone(){
+    return new Muyian(this);
   }
   /**
    * [unix description]
@@ -100,7 +108,7 @@ class Muyian extends Date {
    * @param  {[type]} num [description]
    * @return {[type]}     [description]
    */
-  getWeek(num) {
+  getWeek() {
     return Math.round(this.dayOfYear() / TIME.week) + (this.firstDayYearISO > TIME.weekStart);
   }
   /**
@@ -207,39 +215,13 @@ class Muyian extends Date {
    * @param  {Number} multiple [description]
    * @return {[type]}          [description]
    */
-  relative(date, locale, multiple = 1) {
+  relative(date=new Muyian(), locale, multiple = 1) {
     return Muyian.TIME
       .reduce((res, time, index) => typeof res === 'number'
         && res / TIME[time] < 0
         && Muyian.Intl(locale || this.locale || Muyian.locale, TIME.number)
           .format(Math.round(res / TIME[rever[index - 1]]) * multiple, rever[index - 1])
         || res, this.diff(date));
-  }
-  /**
-   * [to description]
-   * @param  {[type]} date   [description]
-   * @param  {[type]} locale [description]
-   * @return {[type]}        [description]
-   */
-  to(date, locale) {
-    return this.relative(date, locale, -1);
-  }
-  /**
-   * [form description]
-   * @param  {[type]} date   [description]
-   * @param  {[type]} locale [description]
-   * @return {[type]}        [description]
-   */
-  form(date, locale) {
-    return this.relative(date, locale);
-  }
-  /**
-   * [toNow description]
-   * @param  {[type]} locale [description]
-   * @return {[type]}        [description]
-   */
-  toNow(locale) {
-    return this.to(new Muyian(), locale);
   }
   /**
    * [daysInMonth description]
@@ -310,53 +292,57 @@ class Muyian extends Date {
    * @param  {[type]} locale [description]
    * @return {[type]}        [description]
    */
-  format(format, locale) {
-    return format.replace(CHR, chr => ( Muyian.Format[chr[1]]
-      && Muyian.Format[chr[1]](this, locale || this.locale || Muyian.locale) )
-    || chr);
+  format(format='', locale=this.locale || Muyian.locale) {
+    return format.replace(Muyian.toFormat, match => ( Muyian.Format[match]
+      && Muyian.Format[match](this, locale))
+    || match);
   }
 }
+
+['to','from','toNow','fromNow'].forEach(val => Muyian.prototype[val] = Muyian.prototype[val] || function () {
+  var args = [].slice.call(arguments);
+  if(/Now/.test(val)){
+    args.unshift(null);
+  }
+
+  args.push(/to/.test(val) ? -1 : 1);
+  return this.relative.call(this, args);
+});
 
 [MS,S,MIN,H,D,W,M,Q,Y,DATE].forEach(val => Muyian.prototype[val] = Muyian.prototype[val] || function (num) {
   return !isNaN(parseFloat(num)) && isFinite(num) ? this.set(val, num) : this.get(val);
 });
 
 Muyian.Format = {
-  a : (time, locale) => time.toLocaleTimeString(locale, { hour12: true }).split(' ').reverse()[0].toLowerCase(),
   A : (time, locale) => Muyian.Format.a(time, locale).toUpperCase(),
-  c : (time, locale) => time.format(DEFAULT),
-  d : (time, locale) => Muyian.Intl(locale, { day: DIGIT2 }).format(time),
-  D : (time, locale) => Muyian.Intl(locale, { weekday: SHORT }).format(time),
-  e : (time, locale) => Intl.DateTimeFormat(locale).resolvedOptions().timeZone,
-  F : (time, locale) => Muyian.Intl(locale, { month: LONG }).format(time),
-  G : (time, locale) => Muyian.Intl(locale, { hour: NUMERIC }).format(time),
-  g : (time, locale) => Muyian.Intl(locale, { hour: NUMERIC, hourCycle: "h12" }).format(time),
-  H : (time, locale) => Muyian.Intl(locale, { hour: DIGIT2 }).format(time),
-  h : (time, locale) => Muyian.Intl(locale, { hour: NUMERIC }).format(time),
-  i : (time, locale) => Muyian.Intl(locale, { minute: DIGIT2 }).format(time),
-  j : (time, locale) => time.getDate(),
-  L : (time, locale) => time.isLeapYear(),
-  l : (time, locale) => Muyian.Intl(locale, { weekday: LONG }).format(time),
-  m : (time, locale) => Muyian.Intl(locale, { month: DIGIT2 }).format(time),
-  M : (time, locale) => Muyian.Intl(locale, { month: SHORT }).format(time),
-  N : (time, locale) => Muyian.Intl(locale, { day: NUMERIC }).format(time),
-  n : (time, locale) => Muyian.Intl(locale, { month: NUMERIC }).format(time),
-  O : (time, locale) => time.getTimezoneGTM(true),
-  o : (time, locale) => time.isoYear(),
-  P : (time, locale) => time.getTimezoneGTM(),
+  a : (time, locale) => time.toLocaleTimeString(locale, { hour12: true }).split(' ').reverse()[0].toLowerCase(),
+  D : (time, locale) => Muyian.Intl(locale, { day: NUMERIC }).format(time),
+  d : (time, locale) => Muyian.Intl(locale, { weekday: NUMERIC }).format(time),
+  DD : (time, locale) => Muyian.Intl(locale, { day: DIGIT2 }).format(time),
+  dd : (time, locale) => Muyian.Intl(locale, { weekday: SHORT }).format(time),
+  ddd : (time, locale) => Muyian.Intl(locale, { weekday: LONG }).format(time),
+  DDD : (time, locale) => time.daysOfYear(),
+  DDDD: (time, locale) => (parseInt(Muyian.Format.DDD(time, locale), 10) + 1000).toString().substr(1),
+  gg : (time, locale) => time.getWeek(),
+  H : (time, locale) => Muyian.Intl(locale, { hour: NUMERIC }).format(time),
+  HH : (time, locale) => Muyian.Intl(locale, { hour: DIGIT2 }).format(time),
+  h : (time, locale) => Muyian.Intl(locale, { hour: NUMERIC, hourCycle }).format(time),
+  hh : (time, locale) => Muyian.Intl(locale, { hour: DIGIT2, hourCycle }).format(time),
+  m : (time, locale) => Muyian.Intl(locale, { minute: NUMERIC }).format(time),
+  M : (time, locale) => Muyian.Intl(locale, { month: NUMERIC }).format(time),
+  mm : (time, locale) => Muyian.Intl(locale, { minute: DIGIT2 }).format(time),
+  MM : (time, locale) => Muyian.Intl(locale, { month: DIGIT2 }).format(time),
+  MMM : (time, locale) => Muyian.Intl(locale, { month: SHORT }).format(time),
+  MMMM : (time, locale) => Muyian.Intl(locale, { month: LONG }).format(time),
   Q : (time, locale) => time.getQueater(),
-  r : (time, locale) => time.toString(),
-  s : (time, locale) => Muyian.Intl(locale, { second: DIGIT2 }).format(time),
-  t : (time, locale) => time.daysInMonth(),
-  T : (time, locale) => time.getNameTimezone(),
-  U : (time, locale) => time.unix(),
-  v : (time, locale) => (parseInt(time.get(MS), 10) + 1000).toString().substr(1),
-  w : (time, locale) => time.getDay(),
-  W : (time, locale) => time.getWeek(),
-  y : (time, locale) => Muyian.Intl(locale, { year: DIGIT2 }).format(time),
-  Y : (time, locale) => Muyian.Intl(locale, { year: NUMERIC }).format(time),
-  z : (time, locale) => time.dayOfYear(),
-  Z : (time, locale) => time.getTimezone(),
+  s : (time, locale) => Muyian.Intl(locale, { second: NUMERIC }).format(time),
+  ss : (time, locale) => Muyian.Intl(locale, { second: DIGIT2 }).format(time),
+  SSS: (time, locale) => (parseInt(time.get(MS), 10) + 1000).toString().substr(1),
+  X : (time, locale) => time.unix(),
+  YY : (time, locale) => Muyian.Intl(locale, { year: DIGIT2 }).format(time),
+  YYYY : (time, locale) => Muyian.Intl(locale, { year: NUMERIC }).format(time),
+  Z : (time, locale) => time.getTimezoneGTM(),
+  ZZ : (time, locale) => time.getTimezoneGTM(true),
 };
 
 Muyian.Intl = (locale, opts) => new Intl.DateTimeFormat(locale, opts);
@@ -390,6 +376,11 @@ Muyian.isMuyian = any => Muyian.isDate(any) && any instanceof Muyian;
  * @return {[type]}     [description]
  */
 Muyian.unix = any => new Muyian(any);
+/**
+ * RegExp of all the elements
+ * @type {RegExp}
+ */
+Muyian.toFormat = new RegExp( Object.keys(Muyian.Format).join('|'), 'gm' );
 /**
  * [description]
  * @return {[type]} [description]
