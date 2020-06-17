@@ -317,7 +317,7 @@ class Muyian extends Date {
   }
 }
 
-[MS,S,MIN,H,D,W,M,Q,Y,DATE].forEach(val => Muyian.prototype[val] = Muyian.prototype[val] ||function (num) {
+[MS,S,MIN,H,D,W,M,Q,Y,DATE].forEach(val => Muyian.prototype[val] = Muyian.prototype[val] || function (num) {
   return !isNaN(parseFloat(num)) && isFinite(num) ? this.set(val, num) : this.get(val);
 });
 
