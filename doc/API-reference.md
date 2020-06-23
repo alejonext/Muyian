@@ -163,7 +163,7 @@ new Muyian().format(format: string, locale?: string);
 | `%l` | `Saturday` | The name of the day of the week |
 | `%m` | `06` | The month, 2-digits |
 | `%M` | `Dec.` | The abbreviated month name |
-| `%N` | `2` | (time, locale) => Muyian.Intl(locale, { day: NUMERIC }).format(time), |
+| `%N` | `2` | The day of the month |
 | `%n` | `6` | (time, locale) => Muyian.Intl(locale, { month: NUMERIC }).format(time), |
 | `%O` | `+05:00` | (time, locale) => time.getTimezoneGTM(true), |
 | `%o` | | (time, locale) => time.isoYear(), |

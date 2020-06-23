@@ -17,7 +17,7 @@ describe("Display", () => {
 
   it('Format invalid date', () => {
     expect((new Muyian('')).format()).toBe(new Date('').toString())
-    expect((new Muyian(('otherString')).format()).toBe(new Date('otherString').toString())
+    expect((new Muyian('otherString')).format()).toBe(new Date('otherString').toString())
   })
 
   it('Format Year YY YYYY', () => {

@@ -215,11 +215,11 @@ class Muyian extends Date {
    * @param  {Number} multiple [description]
    * @return {[type]}          [description]
    */
-  relative(date=new Muyian(), locale, multiple = 1) {
+  relative(date=new Muyian(), locale = this.locale || Muyian.locale, multiple = 1) {
     return Muyian.TIME
       .reduce((res, time, index) => typeof res === 'number'
         && res / TIME[time] < 0
-        && Muyian.Intl(locale || this.locale || Muyian.locale, TIME.number)
+        && Muyian.Intl(locale, TIME.number)
           .format(Math.round(res / TIME[rever[index - 1]]) * multiple, rever[index - 1])
         || res, this.diff(date));
   }
@@ -249,12 +249,12 @@ class Muyian extends Date {
    * @param  {[type]} sep [description]
    * @return {[type]}     [description]
    */
-  getTimezoneGTM(sep) {
+  getTimezoneGTM(sep, locale= this.locale || Muyian.locale) {
     return Math.sign(this.getTimezoneOffset())
       + ''
-      + Muyian.Format.h(time, this.locale)
+      + Muyian.Format.h(time, locale)
       + (!sep ? ':' : '')
-      + Muyian.Format.m(time, this.locale);
+      + Muyian.Format.m(time, locale);
   }
   /**
    * [getNameTimezone description]
@@ -298,16 +298,6 @@ class Muyian extends Date {
     || match);
   }
 }
-
-['to','from','toNow','fromNow'].forEach(val => Muyian.prototype[val] = Muyian.prototype[val] || function () {
-  var args = [].slice.call(arguments);
-  if(/Now/.test(val)){
-    args.unshift(null);
-  }
-
-  args.push(/to/.test(val) ? -1 : 1);
-  return this.relative.call(this, args);
-});
 
 [MS,S,MIN,H,D,W,M,Q,Y,DATE].forEach(val => Muyian.prototype[val] = Muyian.prototype[val] || function (num) {
   return !isNaN(parseFloat(num)) && isFinite(num) ? this.set(val, num) : this.get(val);
